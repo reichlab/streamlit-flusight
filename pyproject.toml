@@ -19,6 +19,7 @@ dependencies = [
     'pyarrow',
     'streamlit',
     'streamlit-dynamic-filters',
+    'streamlit-aggrid',
     'structlog',
 ]
 
