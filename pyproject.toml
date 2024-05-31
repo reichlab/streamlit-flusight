@@ -11,6 +11,14 @@ classifiers = [
 dynamic = ['version']
 
 dependencies = [
+    'cloudpathlib[S3]',
+    'duckdb',
+    'ibis-framework[duckdb]',
+    'pandas',
+    'polars',
+    'pyarrow',
+    'streamlit',
+    'streamlit-dynamic-filters',
     'structlog',
 ]
 
