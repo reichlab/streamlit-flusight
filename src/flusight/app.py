@@ -6,7 +6,7 @@ import streamlit as st
 import structlog
 from st_aggrid import AgGrid
 
-from flusight import LOCAL_DATA_PATH as data_path
+from flusight import LOCAL_DATA_PATH as local_data_path
 from flusight.util.helpers import filter_dataframe
 from flusight.util.logs import setup_logging
 
@@ -57,7 +57,8 @@ def get_modeL_output_data(db_location: str) -> pd.DataFrame:
 
 
 def main():
-    db_location = str(data_path / "cdcepi-flusight-forecast-hub.db")
+    db_location = str(local_data_path)
+    logger.info("Starting Streamlit app", db_location=db_location)
 
     st.title("CDC FluSight Forecast Hub")
     st.write(

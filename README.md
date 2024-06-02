@@ -5,15 +5,16 @@ and tooling preferences evolve.
 
 ## Installing and running the package (no development)
 
-To install this package via pip:
+To install and run this app locally:
 
 ```bash
 pip install git+https://github.com/reichlab/streamlit-flusight.git
+flusight
 ```
 
-To run it:
+[WIP] To run it from github:
 ```bash
-flusight
+streamlit run https://raw.githubusercontent.com/reichlab/streamlit-flusight/main/src/flusight/app.py
 ```
 
 ## Setup for local development
