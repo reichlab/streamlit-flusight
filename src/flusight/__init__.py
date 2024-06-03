@@ -4,6 +4,9 @@ from cloudpathlib import AnyPath
 
 __version__ = "0.0.1"
 
+# get path of the streamlit app
+STREAMLIT_APP_PATH = files("flusight").joinpath("app.py")
+
 # get location of the local duckdb database
 LOCAL_DATA_PATH = files("flusight.data").joinpath("cdcepi-flusight-forecast-hub.db")
 

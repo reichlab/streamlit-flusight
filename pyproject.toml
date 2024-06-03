@@ -33,10 +33,11 @@ dev = [
 ]
 
 [project.entry-points.'console_scripts']
-flusight = 'flusight.app:main'
+flusight = 'flusight.app_entry_point:main'
 
 [build-system]
-# Minimum requirements for the build system to execute.
+# setuptools_scm plugin ensures that files checked in to source
+# control
 requires = ["setuptools>=64", "setuptools_scm>=8", "wheel"]
 
 [tool.setuptools.packages.find]

@@ -57,8 +57,8 @@ def get_modeL_output_data(db_location: str) -> pd.DataFrame:
 
 
 def main():
+    """Main function for running the Streamlit app."""
     db_location = str(local_data_path)
-    logger.info("Starting Streamlit app", db_location=db_location)
 
     st.title("CDC FluSight Forecast Hub")
     st.write(
