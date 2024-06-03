@@ -4,7 +4,8 @@ import duckdb
 import pandas as pd
 import streamlit as st
 import structlog
-from st_aggrid import AgGrid
+from st_aggrid import AgGrid  # noqa
+from streamlit_dynamic_filters import DynamicFilters  # noqa
 
 from flusight import LOCAL_DATA_PATH as local_data_path
 from flusight.util.helpers import filter_dataframe
@@ -61,8 +62,9 @@ def main():
     db_location = str(local_data_path)
 
     st.title("CDC FluSight Forecast Hub")
+    st.write("🚧 🚧 🚧 🚧")
     st.write(
-        "This is a test of Streamlit using data from the CDC FluSight Forecast Hub: https://github.com/cdcepi/FluSight-forecast-hub"
+        "This is a single page Streamlit app, created with data from the CDC FluSight Forecast Hub: https://github.com/cdcepi/FluSight-forecast-hub"
     )
 
     st.title("Submission Information")
@@ -85,7 +87,7 @@ def main():
     ###############################################################################################
     # st.dataframe(filter_dataframe(df))
     # filters = ["model_id", "round_id", "target_end_date", "target", "horizon", "location", "output_type"]
-    # dynamic_filters = DynamicFilters(df=get_modeL_output_data(), filters=filters)
+    # dynamic_filters = DynamicFilters(df=get_modeL_output_data(db_location), filters=filters)
 
     # # Didn't see a way to set default filter values when instantiating DynamicFilters, so
     # # let's set some default values here and update the DynamicFilters object (to prevent too
