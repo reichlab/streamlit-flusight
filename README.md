@@ -1,21 +1,20 @@
 # Streamlit FluSight
 
-A Python template for personal use. The package itself doesn't do much, but I keep it up to date as my Python workflow
-and tooling preferences evolve.
+This is a toy app for exploring what Streamlit can do and how it works. This code is a learning exercise (i.e., it's not
+optimized for speed, it's not hosted on anything other than a local machine).)
 
 ## Installing and running the package (no development)
 
-To install and run this app locally:
+Because we're not hosting a Streamlit server anywhere, there's no way to run this exploration app without having Python
+installed on your machine.
+
+Once you've confirmed that your machine has Python >=3.10 installed, you can then use pip to install and run this app locally:
 
 ```bash
 pip install git+https://github.com/reichlab/streamlit-flusight.git
 flusight
 ```
 
-[WIP] To run it from github:
-```bash
-streamlit run https://raw.githubusercontent.com/reichlab/streamlit-flusight/main/src/flusight/app.py
-```
 
 ## Setup for local development
 
