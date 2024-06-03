@@ -63,22 +63,48 @@ def main():
     local_data_path = files("flusight.data").joinpath("cdcepi-flusight-forecast-hub.db")
     db_location = str(local_data_path)
 
-    st.title("CDC FluSight Forecast Hub")
+    st.title("Streamlit Test: Flu Forecast Hub")
     st.write("🚧 🚧 🚧 🚧")
     st.write(
         "This is a single page Streamlit app, created with data from the CDC FluSight Forecast Hub: https://github.com/cdcepi/FluSight-forecast-hub"
     )
 
-    st.title("Submission Information")
+    st.header("Submission Information")
+    st.write(
+        """
+             Below is an example of a table that aggregates submission information by model_id. The table is presented in
+             Streamlit's default [dataframe widget](https://docs.streamlit.io/develop/concepts/design/dataframes).
+             """
+    )
     agg_data = get_model_output_aggregates(db_location)
     st.dataframe(agg_data)
 
     st.html("<hr>")
-    st.write("Maybe someone better at charts should do this part...")
+    st.header("Visualizations")
+    st.write(
+        """The chart below was rendered by Streamlit's bar_chart widget. Not exactly what I was going for,
+             but it's intended to show that Streamlit has some [built-in visualizations](https://docs.streamlit.io/develop/api-reference/charts).
+             """
+    )
 
     st.bar_chart(data=agg_data, x="Total Submissions", y="Model", use_container_width=True)
 
-    st.title("Detailed Model Output Data")
+    st.html("<hr>")
+    st.header("Detailed Model Output Data")
+    st.write(
+        """
+            Below is a rendering of a pandas dataframe that contains model-output information. Nothing has been
+            optimized for performance, so this table represents only a subset of the model-output
+            files and renders very slowly.
+            """
+    )
+    st.write(
+        """
+            Unlike the first table, this one is rendered using the
+            [AgGrid](https://github.com/PablocFonseca/streamlit-aggrid) component, in combination with some
+            custom filtering code (which is awkward imo).
+            """
+    )
 
     df = get_modeL_output_data(db_location)
     AgGrid(filter_dataframe(df))
