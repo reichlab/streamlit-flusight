@@ -1,4 +1,5 @@
 import time
+from importlib.resources import files
 
 import duckdb
 import pandas as pd
@@ -7,7 +8,7 @@ import structlog
 from st_aggrid import AgGrid  # noqa
 from streamlit_dynamic_filters import DynamicFilters  # noqa
 
-from flusight import LOCAL_DATA_PATH as local_data_path
+# from flusight import LOCAL_DATA_PATH as local_data_path
 from flusight.util.helpers import filter_dataframe
 from flusight.util.logs import setup_logging
 
@@ -59,6 +60,7 @@ def get_modeL_output_data(db_location: str) -> pd.DataFrame:
 
 def main():
     """Main function for running the Streamlit app."""
+    local_data_path = files("flusight.data").joinpath("cdcepi-flusight-forecast-hub.db")
     db_location = str(local_data_path)
 
     st.title("CDC FluSight Forecast Hub")

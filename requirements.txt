@@ -1,0 +1,165 @@
+# This file is to conform to the project setup requirements of Streamlit
+# community cloud. It was copied manually from requirements/requirements.txt
+# and then edited to include an editable install.    uv pip compile pyproject.toml -o requirements/requirements.txt
+altair==4.2.2
+    # via
+    #   streamlit
+    #   streamlit-aggrid
+atpublic==4.1.0
+    # via ibis-framework
+attrs==23.2.0
+    # via
+    #   jsonschema
+    #   referencing
+bidict==0.23.1
+    # via ibis-framework
+blinker==1.8.2
+    # via streamlit
+boto3==1.34.116
+    # via cloudpathlib
+botocore==1.34.116
+    # via
+    #   boto3
+    #   s3transfer
+cachetools==5.3.3
+    # via streamlit
+certifi==2024.2.2
+    # via requests
+charset-normalizer==3.3.2
+    # via requests
+click==8.1.7
+    # via streamlit
+cloudpathlib==0.18.1
+    # via streamlit-flusight (pyproject.toml)
+duckdb==0.10.3
+    # via
+    #   streamlit-flusight (pyproject.toml)
+    #   ibis-framework
+entrypoints==0.4
+    # via altair
+gitdb==4.0.11
+    # via gitpython
+gitpython==3.1.43
+    # via streamlit
+ibis-framework==9.0.0
+    # via streamlit-flusight (pyproject.toml)
+idna==3.7
+    # via requests
+jinja2==3.1.4
+    # via
+    #   altair
+    #   pydeck
+jmespath==1.0.1
+    # via
+    #   boto3
+    #   botocore
+jsonschema==4.22.0
+    # via altair
+jsonschema-specifications==2023.12.1
+    # via jsonschema
+markdown-it-py==3.0.0
+    # via rich
+markupsafe==2.1.5
+    # via jinja2
+mdurl==0.1.2
+    # via markdown-it-py
+numpy==1.26.4
+    # via
+    #   altair
+    #   ibis-framework
+    #   pandas
+    #   pyarrow
+    #   pydeck
+    #   streamlit
+packaging==24.0
+    # via streamlit
+pandas==2.2.2
+    # via
+    #   streamlit-flusight (pyproject.toml)
+    #   altair
+    #   ibis-framework
+    #   streamlit
+    #   streamlit-aggrid
+parsy==2.1
+    # via ibis-framework
+pillow==10.3.0
+    # via streamlit
+polars==0.20.30
+    # via streamlit-flusight (pyproject.toml)
+protobuf==4.25.3
+    # via streamlit
+pyarrow==16.1.0
+    # via
+    #   streamlit-flusight (pyproject.toml)
+    #   ibis-framework
+    #   streamlit
+pyarrow-hotfix==0.6
+    # via ibis-framework
+pydeck==0.9.1
+    # via streamlit
+pygments==2.18.0
+    # via rich
+python-dateutil==2.9.0.post0
+    # via
+    #   botocore
+    #   ibis-framework
+    #   pandas
+python-decouple==3.8
+    # via streamlit-aggrid
+pytz==2024.1
+    # via
+    #   ibis-framework
+    #   pandas
+referencing==0.35.1
+    # via
+    #   jsonschema
+    #   jsonschema-specifications
+requests==2.32.3
+    # via streamlit
+rich==13.7.1
+    # via
+    #   ibis-framework
+    #   streamlit
+rpds-py==0.18.1
+    # via
+    #   jsonschema
+    #   referencing
+s3transfer==0.10.1
+    # via boto3
+six==1.16.0
+    # via python-dateutil
+smmap==5.0.1
+    # via gitdb
+sqlglot==23.12.2
+    # via ibis-framework
+streamlit==1.35.0
+    # via
+    #   streamlit-flusight (pyproject.toml)
+    #   streamlit-aggrid
+    #   streamlit-dynamic-filters
+streamlit-aggrid==1.0.5
+    # via streamlit-flusight (pyproject.toml)
+streamlit-dynamic-filters==0.1.6
+    # via streamlit-flusight (pyproject.toml)
+structlog==24.1.0
+    # via streamlit-flusight (pyproject.toml)
+tenacity==8.3.0
+    # via streamlit
+toml==0.10.2
+    # via streamlit
+toolz==0.12.1
+    # via
+    #   altair
+    #   ibis-framework
+tornado==6.4
+    # via streamlit
+typing-extensions==4.12.0
+    # via
+    #   ibis-framework
+    #   streamlit
+tzdata==2024.1
+    # via pandas
+urllib3==2.2.1
+    # via
+    #   botocore
+    #   requests
