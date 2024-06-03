@@ -95,9 +95,9 @@ def filter_duckdb(query: duckdb.duckdb.DuckDBPyRelation) -> duckdb.duckdb.DuckDB
     # don't really need to do this every time, but for expediency...
     # if we want to be really fancy, we *could* look at the information_schema, or example:
     # SELECT column_name, data_type FROM information_schema.columns WHERE table_name = 'model_output';
-    columns = query.columns
-    data_types = query.types
-    schema = {col: type for col, type in zip(columns, data_types)}
+    # columns = query.columns
+    # data_types = query.types
+    # schema = {col: type for col, type in zip(columns, data_types)}
 
     # Try to convert datetimes into a standard format (datetime, no timezone)
     # (this is the old pandas-based code)
@@ -111,7 +111,7 @@ def filter_duckdb(query: duckdb.duckdb.DuckDBPyRelation) -> duckdb.duckdb.DuckDB
     #     if is_datetime64_any_dtype(df[col]):
     #         df[col] = df[col].dt.tz_localize(None)
 
-    modification_container = st.container()
+    # modification_container = st.container()
 
     # with modification_container:
     #     to_filter_columns = st.multiselect("Filter model outputs on", query.columns)
