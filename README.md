@@ -88,7 +88,11 @@ To add a dependency to the project:
 
     ```bash
     uv pip compile pyproject.toml -o requirements/requirements.txt && uv pip compile pyproject.toml --extra dev -o requirements/requirements-dev.txt
+
+    # temporary fix to make the app deployable on Streamlit Community Cloud, which expect requirements.txt in the repo root
+    cp requirements/requirements.txt requirements.txt
     ```
+
 3. Update project dependencies:
 
     **Note:** This package was originally developed on MacOS. If you have trouble installing the dependencies. `uv pip sync` has a [`--python-platform` flag](https://github.com/astral-sh/uv?tab=readme-ov-file#multi-platform-resolution) that can be used to specify the platform.
