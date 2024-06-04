@@ -1,61 +1,16 @@
-import time
 from importlib.resources import files
 
-import duckdb
-import pandas as pd
 import streamlit as st
 import structlog
 from st_aggrid import AgGrid  # noqa
 from streamlit_dynamic_filters import DynamicFilters  # noqa
 
 # from flusight import LOCAL_DATA_PATH as local_data_path
-from flusight.util.helpers import filter_dataframe
+from flusight.util.data import get_locations, get_model_output_location_outcome, get_outcomes
 from flusight.util.logs import setup_logging
 
 setup_logging()
 logger = structlog.get_logger()
-
-
-@st.cache_data
-def get_model_output_aggregates(db_location: str) -> pd.DataFrame:
-    with duckdb.connect(db_location, read_only=True) as con:
-        con.sql("INSTALL httpfs;")
-        con.sql("SET http_keep_alive=false;")
-        sql = """
-        SELECT
-          model_id as 'Model',
-          COUNT(DISTINCT reference_date) as 'Total Submissions',
-          MAX(reference_date) as 'Latest Submission'
-        FROM model_output
-        GROUP BY ALL
-        ORDER BY model_id
-        """
-        mo_agg = con.sql(sql)
-        return mo_agg.to_df()
-
-
-@st.cache_data
-def get_modeL_output_data(db_location: str) -> pd.DataFrame:
-    with duckdb.connect(db_location, read_only=True) as con:
-        # Because the front-end components rely on pandas which is sloooooow, this prototype
-        # artificially limits the number of rows being returned via a WHERE clause
-        con.sql("INSTALL httpfs;")
-        con.sql("SET http_keep_alive=false;")
-        sql = """
-        SELECT *
-        FROM model_output
-        WHERE
-          DATEPART('year', reference_date) = 2024
-          AND date_part('month', reference_date) in (4, 5)
-          AND horizon=0
-        """
-        mo_data = con.sql(sql)
-        start = time.process_time()
-        # streamlit accepts pandas dataframes, polars dataframes, and arrow tables
-        # however, a lot of widgets/code seem designed for pandas (which is slower than polars and arrow)
-        mo_data_df = mo_data.to_df()
-        logger.info("converted DuckDB query to dataframe", elapsed_time=time.process_time() - start)
-        return mo_data_df
 
 
 def main():
@@ -63,74 +18,52 @@ def main():
     local_data_path = files("flusight.data").joinpath("cdcepi-flusight-forecast-hub.db")
     db_location = str(local_data_path)
 
-    st.title("Streamlit Test: Flu Forecast Hub")
-    st.write("🚧 🚧 🚧 🚧")
+    st.title("Streamlit Spike")
+    st.write(
+        """
+        This is a test page to see how Streamlit fares when trying to recreate the following
+        COVID-19 Forecast Hub visualization:
+        https://viz.covid19forecasthub.org/
+        """
+    )
     st.write(
         "This is a single page Streamlit app, created with data from the CDC FluSight Forecast Hub: https://github.com/cdcepi/FluSight-forecast-hub"
     )
 
-    st.header("Submission Information")
-    st.write(
-        """
-             Below is an example of a table that aggregates submission information by model_id. The table is presented in
-             Streamlit's default [dataframe widget](https://docs.streamlit.io/develop/concepts/design/dataframes).
-             """
-    )
-    agg_data = get_model_output_aggregates(db_location)
-    st.dataframe(agg_data)
+    # temporary, so we can view the format of the target_data and models selections
+    target_data = "2024-05-25"
+    models = "FluSight-ensemble"
 
-    st.html("<hr>")
-    st.header("Visualizations")
-    st.write(
-        """The chart below was rendered by Streamlit's bar_chart widget. Not exactly what I was going for,
-             but it's intended to show that Streamlit has some [built-in visualizations](https://docs.streamlit.io/develop/api-reference/charts).
-             """
-    )
+    st.write(f"Target Data: {target_data}")
+    st.write(f"Models: {models}")
 
-    st.bar_chart(data=agg_data, x="Total Submissions", y="Model", use_container_width=True)
+    with st.sidebar:
+        location = st.selectbox(
+            "Location",
+            get_locations(db_location),
+            index=59,  # this is cheating
+        )
 
-    st.html("<hr>")
-    st.header("Detailed Model Output Data")
-    st.write(
-        """
-            Below is a rendering of a pandas dataframe that contains model-output information. Nothing has been
-            optimized for performance, so this table represents only a subset of the model-output
-            files and renders very slowly.
-            """
-    )
-    st.write(
-        """
-            Unlike the first table, this one is rendered using the
-            [AgGrid](https://github.com/PablocFonseca/streamlit-aggrid) component, in combination with some
-            custom filtering code (which is awkward imo).
-            """
-    )
+        outcome = st.selectbox(
+            "Outcome",
+            get_outcomes(db_location),
+            index=0,  # more cheating
+        )
 
-    df = get_modeL_output_data(db_location)
-    AgGrid(filter_dataframe(df))
+        target_data = st.multiselect(
+            "Select Target Data:",
+            get_model_output_location_outcome(db_location, location, outcome)["target_end_date"].unique(),
+            max_selections=2,
+            placeholder="2024-05-25",
+        )
 
-    ###############################################################################################
-    # The code below uses a DynamicFilters widget which is less flexible but is nicer looking
-    # than Streamlit's out-of-the-box dataframe widget or the AgGrid widget we're using above.
-    ###############################################################################################
-    # st.dataframe(filter_dataframe(df))
-    # filters = ["model_id", "round_id", "target_end_date", "target", "horizon", "location", "output_type"]
-    # dynamic_filters = DynamicFilters(df=get_modeL_output_data(db_location), filters=filters)
+        models = st.multiselect(
+            "Select Models:",
+            get_model_output_location_outcome(db_location, location, outcome)["model_id"].unique(),
+            placeholder="FluSight-ensemble",
+        )
 
-    # # Didn't see a way to set default filter values when instantiating DynamicFilters, so
-    # # let's set some default values here and update the DynamicFilters object (to prevent too
-    # # much data being displayed during initial rendering)
-    # initial_filter = dynamic_filters.filters
-    # initial_filter["horizon"] = [0]
-    # initial_filter["location"] = ["US"]
-    # initial_filter["round_id"] = ["2024-05-04"]
-    # dynamic_filters.filters = initial_filter
-
-    # dynamic_filters.display_filters(location="sidebar")
-    # dynamic_filters.display_df()
-
-    # line below displays a static version of the dataframe
-    # st.write(get_modeL_output_data())
+    st.dataframe(get_model_output_location_outcome(db_location, location, outcome))
 
 
 if __name__ == "__main__":
