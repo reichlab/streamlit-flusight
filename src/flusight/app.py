@@ -7,7 +7,7 @@ from st_aggrid import AgGrid  # noqa
 from streamlit_dynamic_filters import DynamicFilters  # noqa
 
 # from flusight import LOCAL_DATA_PATH as local_data_path
-from flusight.util.data import get_locations, get_model_output_location_outcome, get_outcomes
+from flusight.util.data import get_locations, get_model_output_location_target, get_targets
 from flusight.util.logs import setup_logging
 
 setup_logging()
@@ -21,6 +21,7 @@ logger = structlog.get_logger()
 # 2. color the scatterplot dots/lines based on model_id
 # 3. plot the target data
 # 4. add the distribution (quantiles) + corresponding drop-down
+# ?? would we ever plot more than one output type on this graph?
 
 
 def main():
@@ -47,15 +48,15 @@ def main():
             index=59,  # this is cheating
         )
 
-        outcome = st.selectbox(
-            "Outcome",
-            get_outcomes(db_location),
+        target = st.selectbox(
+            "Target",
+            get_targets(db_location),
             index=0,  # more cheating
         )
 
         # TODO: disable/remove target data options that don't meet other filtering criteria
         round_id_values = (
-            get_model_output_location_outcome(db_location, location, outcome)["round_id"]
+            get_model_output_location_target(db_location, location, target)["round_id"]
             .drop_duplicates()
             .sort_values(ascending=False)
         )
@@ -67,9 +68,7 @@ def main():
 
         # TODO: disable/remove models that don't meet other filtering criteria
         models_values = (
-            get_model_output_location_outcome(db_location, location, outcome)["model_id"]
-            .drop_duplicates()
-            .sort_values()
+            get_model_output_location_target(db_location, location, target)["model_id"].drop_duplicates().sort_values()
         )
         models = st.multiselect(
             "Select Models:",
@@ -77,7 +76,7 @@ def main():
             default=models_values[models_values == "FluSight-ensemble"],
         )
 
-    render = get_model_output_location_outcome(db_location, location, outcome)
+    render = get_model_output_location_target(db_location, location, target)
     if round:
         render = render[render["round_id"] == round]
     if models:
@@ -85,12 +84,12 @@ def main():
 
     fig = px.scatter(
         render,
-        title=f"Forecasts of {outcome} in {location} as of round {round}",
+        title=f"Forecasts of {target} in {location} as of round {round}",
         x="target_end_date",
         y="value",
         color="model_id",
         symbol="model_id",
-        labels={"model_id": "model", "target_end_date": "target end date", "value": f"{outcome}"},
+        labels={"model_id": "model", "target_end_date": "target end date", "value": f"{target}"},
         hover_data=["value"],
     )
     fig.update_traces(mode="lines+markers")
