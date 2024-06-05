@@ -1,5 +1,6 @@
 from importlib.resources import files
 
+import plotly.express as px
 import streamlit as st
 import structlog
 from st_aggrid import AgGrid  # noqa
@@ -11,6 +12,15 @@ from flusight.util.logs import setup_logging
 
 setup_logging()
 logger = structlog.get_logger()
+
+
+# TODOs:
+# 1. filters aren't working quite right...the way we're creating a variable to hold
+# the filtered dataframe isn't triggering whatever mechanism tells Streamlit to
+# update its components
+# 2. color the scatterplot dots/lines based on model_id
+# 3. plot the target data
+# 4. add the distribution (quantiles) + corresponding drop-down
 
 
 def main():
@@ -30,13 +40,6 @@ def main():
         "This is a single page Streamlit app, created with data from the CDC FluSight Forecast Hub: https://github.com/cdcepi/FluSight-forecast-hub"
     )
 
-    # temporary, so we can view the format of the target_data and models selections
-    target_data = "2024-05-25"
-    models = "FluSight-ensemble"
-
-    st.write(f"Target Data: {target_data}")
-    st.write(f"Models: {models}")
-
     with st.sidebar:
         location = st.selectbox(
             "Location",
@@ -50,21 +53,58 @@ def main():
             index=0,  # more cheating
         )
 
-        target_data = st.multiselect(
-            "Select Target Data:",
-            get_model_output_location_outcome(db_location, location, outcome)["target_end_date"].unique(),
-            max_selections=2,
-            placeholder="2024-05-25",
+        # TODO: disable/remove target data options that don't meet other filtering criteria
+        round_id_values = (
+            get_model_output_location_outcome(db_location, location, outcome)["round_id"]
+            .drop_duplicates()
+            .sort_values(ascending=False)
+        )
+        round = st.selectbox(
+            "Select Round Id:",
+            round_id_values,
+            index=0,
         )
 
+        # TODO: disable/remove models that don't meet other filtering criteria
+        models_values = (
+            get_model_output_location_outcome(db_location, location, outcome)["model_id"]
+            .drop_duplicates()
+            .sort_values()
+        )
         models = st.multiselect(
             "Select Models:",
-            get_model_output_location_outcome(db_location, location, outcome)["model_id"].unique(),
-            placeholder="FluSight-ensemble",
+            models_values,
+            default=models_values[models_values == "FluSight-ensemble"],
         )
 
-    st.dataframe(get_model_output_location_outcome(db_location, location, outcome))
+    render = get_model_output_location_outcome(db_location, location, outcome)
+    if round:
+        render = render[render["round_id"] == round]
+    if models:
+        render = render[render["model_id"].isin(models)]
+
+    fig = px.scatter(
+        render,
+        title=f"Forecasts of {outcome} in {location} as of round {round}",
+        x="target_end_date",
+        y="value",
+        color="model_id",
+        symbol="model_id",
+        labels={"model_id": "model", "target_end_date": "target end date", "value": f"{outcome}"},
+        hover_data=["value"],
+    )
+    fig.update_traces(mode="lines+markers")
+    st.plotly_chart(fig, key="scatter", on_select="rerun")
+
+    # this is here for reference, to make sure the filters are working as intended
+    st.dataframe(render)
 
 
 if __name__ == "__main__":
     main()
+
+
+# interesting test cases
+# model_id = "UGA_flucast-OKeeffe"
+# this model only has 3 submissions
+# round_ids = 2023-10-14, 2023-10-21, 2023-10-28
