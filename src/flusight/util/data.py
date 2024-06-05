@@ -48,3 +48,18 @@ def get_targets(db_location: str) -> pd.Series:
         """
         targets = con.sql(sql)
         return targets.to_df()
+
+
+@st.cache_data
+def get_output_type_ids(db_location: str) -> pd.Series:
+    with duckdb.connect(db_location, read_only=True) as con:
+        con.sql("INSTALL httpfs;")
+        con.sql("SET http_keep_alive=false;")
+        sql = """
+        SELECT DISTINCT output_type_id
+        FROM model_output
+        WHERE output_type = 'quantile'
+        ORDER BY output_type_id
+        """
+        output_type_ids = con.sql(sql)
+        return output_type_ids.to_df()

@@ -1,14 +1,14 @@
 from importlib.resources import files
 
-import plotly.express as px
 import streamlit as st
 import structlog
 from st_aggrid import AgGrid  # noqa
 from streamlit_dynamic_filters import DynamicFilters  # noqa
 
 # from flusight import LOCAL_DATA_PATH as local_data_path
-from flusight.util.data import get_locations, get_model_output_location_target, get_targets
+from flusight.util.data import get_locations, get_model_output_location_target, get_output_type_ids, get_targets
 from flusight.util.logs import setup_logging
+from flusight.util.viz import create_scatterplot
 
 setup_logging()
 logger = structlog.get_logger()
@@ -54,6 +54,12 @@ def main():
             index=0,  # more cheating
         )
 
+        output_type_id = st.selectbox(
+            "Output Type ID",
+            get_output_type_ids(db_location),
+            index=0,
+        )
+
         # TODO: disable/remove target data options that don't meet other filtering criteria
         round_id_values = (
             get_model_output_location_target(db_location, location, target)["round_id"]
@@ -82,17 +88,19 @@ def main():
     if models:
         render = render[render["model_id"].isin(models)]
 
-    fig = px.scatter(
-        render,
-        title=f"Forecasts of {target} in {location} as of round {round}",
-        x="target_end_date",
-        y="value",
-        color="model_id",
-        symbol="model_id",
-        labels={"model_id": "model", "target_end_date": "target end date", "value": f"{target}"},
-        hover_data=["value"],
-    )
-    fig.update_traces(mode="lines+markers")
+    fig = create_scatterplot(render, target, location, round)
+
+    # fig = px.scatter(
+    #     render,
+    #     title=f"Forecasts of {target} in {location} as of round {round}",
+    #     x="target_end_date",
+    #     y="value",
+    #     color="model_id",
+    #     symbol="model_id",
+    #     labels={"model_id": "model", "target_end_date": "target end date", "value": f"{target}"},
+    #     hover_data=["value"],
+    # )
+    # fig.update_traces(mode="lines+markers")
     st.plotly_chart(fig, key="scatter", on_select="rerun")
 
     # this is here for reference, to make sure the filters are working as intended
