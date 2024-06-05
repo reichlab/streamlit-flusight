@@ -6,9 +6,15 @@ from st_aggrid import AgGrid  # noqa
 from streamlit_dynamic_filters import DynamicFilters  # noqa
 
 # from flusight import LOCAL_DATA_PATH as local_data_path
-from flusight.util.data import get_locations, get_model_output_location_target, get_output_type_ids, get_targets
+from flusight.util.data import (
+    get_locations,
+    get_model_output_location_target,
+    get_output_type_ids,
+    get_target_data,
+    get_targets,
+)
 from flusight.util.logs import setup_logging
-from flusight.util.viz import create_scatterplot
+from flusight.util.viz import create_target_scatterplot
 
 setup_logging()
 logger = structlog.get_logger()
@@ -38,10 +44,11 @@ def main():
         """
     )
     st.write(
-        "This is a single page Streamlit app, created with data from the CDC FluSight Forecast Hub: https://github.com/cdcepi/FluSight-forecast-hub"
+        "The chart is generated with quantile-type forecasts from the CDC FluSight Forecast Hub: https://github.com/cdcepi/FluSight-forecast-hub"
     )
 
     with st.sidebar:
+        # TODO: pull location list from the target data so we can use state names instead of FIPS code
         location = st.selectbox(
             "Location",
             get_locations(db_location),
@@ -57,6 +64,12 @@ def main():
         output_type_id = st.selectbox(
             "Output Type ID",
             get_output_type_ids(db_location),
+            index=0,
+        )
+
+        target_date = st.selectbox(
+            "Target Date:",
+            get_target_data(db_location, target)["date"].drop_duplicates().sort_values(ascending=False),
             index=0,
         )
 
@@ -88,7 +101,9 @@ def main():
     if models:
         render = render[render["model_id"].isin(models)]
 
-    fig = create_scatterplot(render, target, location, round)
+    target_data = get_target_data(db_location, target, location=location)
+
+    fig = create_target_scatterplot(target_data, target)
 
     # fig = px.scatter(
     #     render,

@@ -2,6 +2,23 @@ import duckdb
 import pandas as pd
 import streamlit as st
 
+from flusight import LOCAL_TARGET_DATA_PATH as target_data_path
+
+
+@st.cache_data
+def get_target_data(db_location: str, target: str, target_date: str = None, location: str = None) -> pd.DataFrame:
+    """Retrieve the hub's target data."""
+
+    # TODO: add target data as a table in the DuckDB file. For now, just
+    # grab the .csv from disk
+    target_data = pd.read_csv(str(target_data_path))
+    if target_date:
+        target_data = target_data[target_data.date == target_date]
+    if location:
+        target_data = target_data[target_data.location == location]
+
+    return target_data
+
 
 @st.cache_data
 def get_model_output_location_target(db_location: str, location: str, target: str) -> pd.DataFrame:
