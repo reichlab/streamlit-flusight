@@ -14,7 +14,7 @@ from flusight.util.data import (
     get_targets,
 )
 from flusight.util.logs import setup_logging
-from flusight.util.viz import create_target_scatterplot
+from flusight.util.viz import create_target_scatterplot, plot_model_forecast
 
 setup_logging()
 logger = structlog.get_logger()
@@ -25,8 +25,10 @@ logger = structlog.get_logger()
 # the filtered dataframe isn't triggering whatever mechanism tells Streamlit to
 # update its components
 # 2. color the scatterplot dots/lines based on model_id
-# 3. plot the target data
 # 4. add the distribution (quantiles) + corresponding drop-down
+# 5. Center title and make bigger
+# 6. Format hover
+# 7. Update select box options based on other selections (e.g., don't display models w/o submissions for the selected round_id)
 # ?? would we ever plot more than one output type on this graph?
 
 
@@ -73,17 +75,18 @@ def main():
             index=0,
         )
 
-        # TODO: disable/remove target data options that don't meet other filtering criteria
-        round_id_values = (
-            get_model_output_location_target(db_location, location, target)["round_id"]
-            .drop_duplicates()
-            .sort_values(ascending=False)
-        )
-        round = st.selectbox(
-            "Select Round Id:",
-            round_id_values,
-            index=0,
-        )
+        # Use a fixed round_id for demo purposes
+        # round_id_values = (
+        #     get_model_output_location_target(db_location, location, target)["round_id"]
+        #     .drop_duplicates()
+        #     .sort_values(ascending=False)
+        # )
+        # round_id = st.selectbox(
+        #     "Select Round Id:",
+        #     round_id_values,
+        #     index=0,
+        # )
+        round_id = "2024-05-04"
 
         # TODO: disable/remove models that don't meet other filtering criteria
         models_values = (
@@ -95,31 +98,29 @@ def main():
             default=models_values[models_values == "FluSight-ensemble"],
         )
 
-    render = get_model_output_location_target(db_location, location, target)
-    if round:
-        render = render[render["round_id"] == round]
+    mo = get_model_output_location_target(db_location, location, target)
     if models:
-        render = render[render["model_id"].isin(models)]
+        mo = mo[mo["model_id"].isin(models)]
+    if round_id:
+        mo = mo[mo["round_id"] == round_id]
 
     target_data = get_target_data(db_location, target, location=location)
+    model_predictions = [mo[mo.model_id == model] for model in models]
 
     fig = create_target_scatterplot(target_data, target)
+    fig = plot_model_forecast(fig, model_predictions, output_type_id)
 
-    # fig = px.scatter(
-    #     render,
-    #     title=f"Forecasts of {target} in {location} as of round {round}",
-    #     x="target_end_date",
-    #     y="value",
-    #     color="model_id",
-    #     symbol="model_id",
-    #     labels={"model_id": "model", "target_end_date": "target end date", "value": f"{target}"},
-    #     hover_data=["value"],
-    # )
-    # fig.update_traces(mode="lines+markers")
+    # uncomment below to see the figure's underlying data for debugging
+    # fig_data = fig.data
+    # fig_data
+
+    st.header("Forecast Viz")
     st.plotly_chart(fig, key="scatter", on_select="rerun")
 
+    st.html("<hr>")
+    st.header("Supporting Data")
     # this is here for reference, to make sure the filters are working as intended
-    st.dataframe(render)
+    st.dataframe(mo)
 
 
 if __name__ == "__main__":
