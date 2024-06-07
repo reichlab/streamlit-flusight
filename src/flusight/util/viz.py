@@ -4,13 +4,15 @@ import plotly.express as px
 import plotly.graph_objects as go
 
 
-def create_target_scatterplot(target_data: pd.DataFrame, target: str) -> plotly.graph_objs._figure.Figure:
+def create_target_scatterplot(
+    target_data: pd.DataFrame, target: str, round_id: str
+) -> plotly.graph_objs._figure.Figure:
     """Return the initial scatterplot."""
 
     location = target_data.iloc[0].location_name
     fig = px.scatter(
         target_data,
-        title=f"Forecasts of {target} for round_id 2024-05-04: {location}",
+        title=f"Forecasts of {target} for round_id {round_id}: {location}",
         x="date",
         y="value",
         labels={"date": "target date", "value": f"{target}"},

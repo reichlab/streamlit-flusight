@@ -2,8 +2,6 @@ from importlib.resources import files
 
 import streamlit as st
 import structlog
-from st_aggrid import AgGrid  # noqa
-from streamlit_dynamic_filters import DynamicFilters  # noqa
 
 # from flusight import LOCAL_DATA_PATH as local_data_path
 from flusight.util.data import (
@@ -13,6 +11,7 @@ from flusight.util.data import (
     get_target_data,
     get_targets,
 )
+from flusight.util.helpers import get_round
 from flusight.util.logs import setup_logging
 from flusight.util.viz import create_target_scatterplot, plot_model_forecast
 
@@ -33,6 +32,8 @@ def main():
     db_location = str(local_data_path)
 
     st.set_page_config(layout="wide")
+    if "round_id" not in st.session_state:
+        st.session_state["round_id"] = "2024-05-04"
 
     st.title("Streamlit Spike")
     st.write(
@@ -72,19 +73,6 @@ def main():
             index=0,
         )
 
-        # Use a fixed round_id for demo purposes
-        # round_id_values = (
-        #     get_model_output_location_target(db_location, location, target)["round_id"]
-        #     .drop_duplicates()
-        #     .sort_values(ascending=False)
-        # )
-        # round_id = st.selectbox(
-        #     "Select Round Id:",
-        #     round_id_values,
-        #     index=0,
-        # )
-        round_id = "2024-05-04"
-
         # TODO: disable/remove models that don't meet other filtering criteria
         models_values = (
             get_model_output_location_target(db_location, location, target)["model_id"].drop_duplicates().sort_values()
@@ -98,13 +86,13 @@ def main():
     mo = get_model_output_location_target(db_location, location, target)
     if models:
         mo = mo[mo["model_id"].isin(models)]
-    if round_id:
-        mo = mo[mo["round_id"] == round_id]
+    if st.session_state.round_id:
+        mo = mo[mo["round_id"] == st.session_state.round_id]
 
     target_data = get_target_data(db_location, target, location=location)
     model_predictions = [mo[mo.model_id == model] for model in models]
 
-    fig = create_target_scatterplot(target_data, target)
+    fig = create_target_scatterplot(target_data, target, st.session_state.round_id)
     fig = plot_model_forecast(fig, model_predictions, output_type_id)
 
     # uncomment below to see the figure's underlying data for debugging
@@ -113,6 +101,20 @@ def main():
 
     st.header("Forecast Viz")
     st.plotly_chart(fig, key="scatter", on_select="rerun", use_container_width=True)
+
+    previous, next = st.columns(2, gap="small")
+    with previous:
+        st.button(
+            "Previous Round",
+            help="display the last forecast submission round",
+            on_click=lambda: st.session_state.update(round_id=get_round(st.session_state.round_id, "previous")),
+        )
+    with next:
+        st.button(
+            "Next Round",
+            help="display the next forecast submission round",
+            on_click=lambda: st.session_state.update(round_id=get_round(st.session_state.round_id, "next")),
+        )
 
     st.html("<hr>")
     st.header("Supporting Data")
