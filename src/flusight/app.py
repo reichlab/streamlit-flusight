@@ -21,13 +21,8 @@ logger = structlog.get_logger()
 
 
 # TODOs:
-# 1. filters aren't working quite right...the way we're creating a variable to hold
-# the filtered dataframe isn't triggering whatever mechanism tells Streamlit to
-# update its components
 # 2. color the scatterplot dots/lines based on model_id
 # 4. add the distribution (quantiles) + corresponding drop-down
-# 5. Center title and make bigger
-# 6. Format hover
 # 7. Update select box options based on other selections (e.g., don't display models w/o submissions for the selected round_id)
 # ?? would we ever plot more than one output type on this graph?
 
@@ -36,6 +31,8 @@ def main():
     """Main function for running the Streamlit app."""
     local_data_path = files("flusight.data").joinpath("cdcepi-flusight-forecast-hub.db")
     db_location = str(local_data_path)
+
+    st.set_page_config(layout="wide")
 
     st.title("Streamlit Spike")
     st.write(
@@ -115,7 +112,7 @@ def main():
     # fig_data
 
     st.header("Forecast Viz")
-    st.plotly_chart(fig, key="scatter", on_select="rerun")
+    st.plotly_chart(fig, key="scatter", on_select="rerun", use_container_width=True)
 
     st.html("<hr>")
     st.header("Supporting Data")

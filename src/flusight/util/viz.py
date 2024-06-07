@@ -17,6 +17,7 @@ def create_target_scatterplot(target_data: pd.DataFrame, target: str) -> plotly.
         hover_data=["value"],
     )
     fig.update_traces(mode="lines", name="target_data")
+    fig.update_layout(title_x=0.1, title_font_color="grey", title={"font": {"size": 25}})
 
     return fig
 
@@ -54,7 +55,7 @@ def plot_model_forecast(
                 y=prediction_values["value"],
                 mode="lines",
                 name=model_id,
-                legendgroup="model_id",
+                legendgroup=model_id,
                 hoverinfo="y",
                 hovertemplate=hover_text,
             )
@@ -65,7 +66,6 @@ def plot_model_forecast(
         # https://plotly.com/python/continuous-error-bars/
         fig_target.add_trace(
             go.Scatter(
-                # x=horizon_date_list+horizon_date_list[::-1],
                 x=prediction_values["target_end_date"].tolist() + prediction_values["target_end_date"].tolist()[::-1],
                 y=prediction_values_upper + prediction_values_lower[::-1],
                 name=model_id,
@@ -73,7 +73,7 @@ def plot_model_forecast(
                 line=dict(width=0),
                 fill="toself",
                 hoverinfo="skip",
-                legendgroup="model_id",
+                legendgroup=model_id,
                 showlegend=False,
             )
         )
