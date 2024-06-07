@@ -171,3 +171,5 @@ urllib3==2.2.1
     # via
     #   botocore
     #   requests
+-e .
+    # via manual process for get Streamlist cloud working
