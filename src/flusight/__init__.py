@@ -9,6 +9,7 @@ STREAMLIT_APP_PATH = files("flusight").joinpath("app.py")
 
 # get location of the local duckdb database
 LOCAL_DATA_PATH = files("flusight.data").joinpath("cdcepi-flusight-forecast-hub.db")
+LOCAL_TARGET_DATA_PATH = files("flusight.data").joinpath("target-hospital-admissions.csv")
 
 # set value for the S3 data path
 S3_DATA_PATH = AnyPath("s3://bsweger-flusight-forecast/data")

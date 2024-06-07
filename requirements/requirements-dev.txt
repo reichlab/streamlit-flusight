@@ -87,9 +87,11 @@ numpy==1.26.4
     #   pandas
     #   pyarrow
     #   pydeck
+    #   scipy
     #   streamlit
 packaging==24.0
     # via
+    #   plotly
     #   pytest
     #   streamlit
 pandas==2.2.2
@@ -105,6 +107,8 @@ pillow==10.3.0
     # via streamlit
 platformdirs==4.2.1
     # via virtualenv
+plotly==5.22.0
+    # via streamlit-flusight (pyproject.toml)
 pluggy==1.5.0
     # via pytest
 polars==0.20.30
@@ -157,6 +161,8 @@ ruff==0.4.3
     # via streamlit-flusight (pyproject.toml)
 s3transfer==0.10.1
     # via boto3
+scipy==1.13.1
+    # via streamlit-flusight (pyproject.toml)
 setuptools==70.0.0
     # via nodeenv
 six==1.16.0
@@ -177,7 +183,9 @@ streamlit-dynamic-filters==0.1.6
 structlog==24.1.0
     # via streamlit-flusight (pyproject.toml)
 tenacity==8.3.0
-    # via streamlit
+    # via
+    #   plotly
+    #   streamlit
 toml==0.10.2
     # via streamlit
 toolz==0.12.1
