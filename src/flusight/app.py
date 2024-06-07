@@ -66,7 +66,7 @@ def main():
             index=0,
         )
 
-        target_date = st.selectbox(
+        target_date = st.selectbox(  # noqa
             "Target Date:",
             get_target_data(db_location, target)["date"].drop_duplicates().sort_values(ascending=False),
             index=0,
