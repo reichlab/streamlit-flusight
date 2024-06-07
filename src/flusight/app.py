@@ -67,12 +67,6 @@ def main():
             index=0,
         )
 
-        target_date = st.selectbox(  # noqa
-            "Target Date:",
-            get_target_data(db_location, target)["date"].drop_duplicates().sort_values(ascending=False),
-            index=0,
-        )
-
         # TODO: disable/remove models that don't meet other filtering criteria
         models_values = (
             get_model_output_location_target(db_location, location, target)["model_id"].drop_duplicates().sort_values()
