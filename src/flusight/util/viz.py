@@ -3,6 +3,8 @@ import plotly
 import plotly.express as px
 import plotly.graph_objects as go
 
+from flusight.util.helpers import wes_anderson_colors
+
 
 def create_target_scatterplot(
     target_data: pd.DataFrame, target: str, round_id: str
@@ -37,13 +39,19 @@ def plot_model_forecast(
 
     hover_text = "value: %{y}<br>date: %{x}"
 
-    for mo in model_data:
+    for index, mo in enumerate(model_data):
         # workaround until we stop allowing users to select models
         # that don't have submissions for the currently selected round_id
         try:
             model_id = mo["model_id"].iloc[0]
         except IndexError:
             continue
+
+        try:
+            color = wes_anderson_colors[index - 1]
+        except IndexError:
+            # in case we run out of colors
+            color = "#854D65"
 
         # grab the values we want on the line (the demo is limited to quantile output types, so
         # we'll just make them numeric for df manipulation)
@@ -79,5 +87,8 @@ def plot_model_forecast(
                 showlegend=False,
             )
         )
+
+        # set model's line and fills to the same color
+        fig_target.update_traces(marker=dict(color=color), selector=dict(name=model_id))
 
     return fig_target

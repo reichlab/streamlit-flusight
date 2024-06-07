@@ -1,3 +1,5 @@
+"""Some random things."""
+
 round_ids = [
     "2023-10-07",
     "2023-10-14",
@@ -49,3 +51,6 @@ def get_round(current_round_id, direction="next"):
         new_round_id = current_round_id
 
     return new_round_id
+
+
+wes_anderson_colors = ["#E6A8B5", "#F4D35E", "#A7C5EB", "#8BAF9F", "#7B3B8B", "#B78B56"]
